@@ -5,7 +5,8 @@ import React, { Component } from 'react';
 // data
 let globalStorage = {
     "Recipe1": ["bla bla", "something1", "somethign2"],
-    "Recipe2": ["bla bla", "something1", "somethign2"]
+    "Recipe2": ["bla bla", "something1", "somethign2"],
+    "Recipe3": ["bla bla", "something1", "somethign2"]
 };
 
 
@@ -13,13 +14,37 @@ let globalStorage = {
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { recipes: globalStorage }
-        this.addRecipe = this.addRecipe.bind(this);
+        this.state = {
+            recipes: globalStorage,
+            newTitle: "",
+            newIngredients: ""
+        };
+
+
+        this.openNewRecipeModal = this.openNewRecipeModal.bind(this);
+        this.newTitle = this.newTitle.bind(this);
+        this.newIngredients = this.newIngredients.bind(this);
+        this.addNewRecipe = this.addNewRecipe.bind(this);
     }
 
     // adding recipe function, opens up add recipe modal
-    addRecipe() {
+    openNewRecipeModal() {
         console.log("Adding recipe");
+    }
+
+    addNewRecipe(e) {
+        e.preventDefault();
+        let recipes = this.state.recipes;
+        recipes[this.state.newTitle] = this.state.newIngredients.split(',');
+        this.setState({ recipes: recipes, newTitle: "", newIngredients: "" });
+    }
+
+    newTitle(e) {
+        this.setState({ newTitle: e.target.value.toString() });
+    }
+
+    newIngredients(e) {
+        this.setState({ newIngredients: e.target.value });
     }
 
     render() {
@@ -31,8 +56,25 @@ class App extends Component {
         });
 
         return (
-            <div className="recipe-container">
-                {recipes}
+            <div>
+                <div className="recipe-container">
+                    {recipes}
+                </div>
+
+                <div className="new-recipe">
+                    <label htmlFor="newRecipe-title">Title: </label> <br />
+                    <input id="newRecipe-title"
+                        onChange={this.newTitle}
+                        value={this.state.newTitle} />
+                    <br />
+                    <label htmlFor="newRecipe-ingredients">Ingredients: </label><br />
+                    <input id="newRecipe-ingredients"
+                        onChange={this.newIngredients}
+                        value={this.state.newIngredients} autocomplete="off" />
+                    <br />
+
+                    <button onClick={this.addNewRecipe}> Add Recipe </button>
+                </div>
             </div>
         );
     }
@@ -44,7 +86,9 @@ class Recipe extends Component {
         this.state = {
             ingredients: this.props.ingredients,
             title: this.props.title,
-            modalOpen: false
+            modalOpen: false,
+            oldTitle: this.props.title,
+            oldIngredients: this.props.ingredients,
         }
 
 
@@ -67,7 +111,11 @@ class Recipe extends Component {
     }
 
     saveRecipe() {
-        console.log("save recipe");
+        this.setState({
+            oldTitle: this.state.title,
+            oldIngredients: this.state.ingredients,
+            modalOpen: false
+        });
     }
 
     deleteRecipe() {
@@ -78,8 +126,13 @@ class Recipe extends Component {
         this.setState({ modalOpen: true });
     }
 
+    // if you close before you press save, recipe content will stay the same
     closeRecipeModal() {
-        this.setState({ modalOpen: false });
+        this.setState({
+            modalOpen: false,
+            title: this.state.oldTitle,
+            ingredients: this.state.oldIngredients
+        });
     }
 
 
