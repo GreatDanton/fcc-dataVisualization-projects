@@ -4,11 +4,11 @@ React project from FreeCodeCamp Data Visualization Projects section.
 
 # Screenshots
 
-![Front Page](/images/frontPage.png)
+![Front Page](images/frontPage.png)
 
-![Recipe View](/images/recipeView.png)
+![Recipe View](images/recipeView.png)
 
-![New Recipe](/images/newRecipe.png)
+![New Recipe](images/newRecipe.png)
 
 ## User stories
 * User Story: I can create recipes that have names and ingredients.
