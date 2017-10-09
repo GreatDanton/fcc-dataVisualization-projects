@@ -1,170 +1,164 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { RecipeContainer, ViewRecipe } from './Recipe';
+import { NewRecipeModal } from './NewRecipe';
 
 
 // Global storage for handling recipe data. Each component has access to globalStorage
 // data
 let globalStorage = {
-    "Recipe1": ["bla bla", "something1", "somethign2"],
-    "Recipe2": ["bla bla", "something1", "somethign2"],
-    "Recipe3": ["bla bla", "something1", "somethign2"]
+    "Coffee": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/A_small_cup_of_coffee.JPG/275px-A_small_cup_of_coffee.JPG",
+        "ingredients": ["Hot Water", "Coffee"],
+        "description": "First we boil the water then we place the coffee grounds into the water"
+    },
+    "Pasta": {
+        "image": "http://www.simplyrecipes.com/wp-content/uploads/2006/09/italian-sausage-spaghetti-horiz-640.jpg",
+        "ingredients": ["Hot water, Pasta"],
+        "description": "First we make this and then we create that"
+    },
+    "More Coffee": {
+        "image": "http://www.paleoplan.com/wp-content/uploads/2015/02/is-coffee-paleo.jpg",
+        "ingredients": ["Coffee, more coffee"],
+        "description": "Throw grounds of coffee into the boiling pot and brew that delicious coffee"
+    }
 };
 
 
-// outer container
-class App extends Component {
+// outer app container that is embedded into the app
+class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             recipes: globalStorage,
+            // for storing data for new recipe
+            newRecipeOpen: false,
             newTitle: "",
-            newIngredients: ""
-        };
-
-
-        this.openNewRecipeModal = this.openNewRecipeModal.bind(this);
-        this.newTitle = this.newTitle.bind(this);
-        this.newIngredients = this.newIngredients.bind(this);
-        this.addNewRecipe = this.addNewRecipe.bind(this);
-    }
-
-    // adding recipe function, opens up add recipe modal
-    openNewRecipeModal() {
-        console.log("Adding recipe");
-    }
-
-    addNewRecipe(e) {
-        e.preventDefault();
-        let recipes = this.state.recipes;
-        recipes[this.state.newTitle] = this.state.newIngredients.split(',');
-        this.setState({ recipes: recipes, newTitle: "", newIngredients: "" });
-    }
-
-    newTitle(e) {
-        this.setState({ newTitle: e.target.value.toString() });
-    }
-
-    newIngredients(e) {
-        this.setState({ newIngredients: e.target.value });
-    }
-
-    render() {
-        let titles = Object.keys(this.state.recipes);
-        let recipes = titles.map((title, index) => {
-            return (
-                <Recipe key={index} title={title} ingredients={this.state.recipes[title]} />
-            )
-        });
-
-        return (
-            <div>
-                <div className="recipe-container">
-                    {recipes}
-                </div>
-
-                <div className="new-recipe">
-                    <label htmlFor="newRecipe-title">Title: </label> <br />
-                    <input id="newRecipe-title"
-                        onChange={this.newTitle}
-                        value={this.state.newTitle} />
-                    <br />
-                    <label htmlFor="newRecipe-ingredients">Ingredients: </label><br />
-                    <input id="newRecipe-ingredients"
-                        onChange={this.newIngredients}
-                        value={this.state.newIngredients} autocomplete="off" />
-                    <br />
-
-                    <button onClick={this.addNewRecipe}> Add Recipe </button>
-                </div>
-            </div>
-        );
-    }
-}
-
-class Recipe extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            ingredients: this.props.ingredients,
-            title: this.props.title,
-            modalOpen: false,
-            oldTitle: this.props.title,
-            oldIngredients: this.props.ingredients,
+            newImage: "",
+            newIngredients: "",
+            newDescription: "",
+            newRecipeError: "", // show error message if any field is empty
+            // for rendering view recipe modal
+            viewRecipeOpen: false,
+            viewRecipeData: "",
+            viewRecipeTitle: "",
         }
 
-
-        this.openRecipeModal = this.openRecipeModal.bind(this);
-        this.closeRecipeModal = this.closeRecipeModal.bind(this);
-
-        this.saveRecipe = this.saveRecipe.bind(this);
-        this.deleteRecipe = this.deleteRecipe.bind(this);
-        this.changeIngredients = this.changeIngredients.bind(this);
-        this.changeTitle = this.changeTitle.bind(this);
+        // handling new recipe modal window
+        this.openNewRecipe = this.openNewRecipe.bind(this);
+        this.newRecipeChange = this.newRecipeChange.bind(this);
+        this.newRecipeSave = this.newRecipeSave.bind(this);
+        this.newRecipeCancel = this.newRecipeCancel.bind(this);
+        // opening recipe
+        this.showRecipe = this.showRecipe.bind(this);
+        this.recipeClose = this.recipeClose.bind(this);
+        this.recipeDelete = this.recipeDelete.bind(this);
     }
 
-    changeTitle(e) {
-        this.setState({ title: e.target.value });
+    openNewRecipe() {
+        if (!this.state.newRecipeOpen) {
+            this.setState({ newRecipeOpen: true });
+        }
     }
 
-    changeIngredients(e) {
-        let ing = e.target.value.split(',');
-        this.setState({ ingredients: ing });
+    // set state when typing into input boxes in new recipe modal
+    newRecipeChange(e) {
+        let id = e.target.id;
+        let val = e.target.value;
+        this.setState({ [id]: val })
     }
 
-    saveRecipe() {
+    // Save new recipe to the local storage
+    // TODO: save the recipe to the local storage
+    newRecipeSave() {
+        let title = this.state.newTitle;
+        let desc = this.state.newDescription;
+        let image = this.state.newImage;
+        let ingredients = this.state.newIngredients.split(',')
+        let message = ""
+        if (title.length < 1) {
+            message += "Empty title is not allowed. "
+        }
+
+        if (desc.length < 1) {
+            message += "Description should not be empty. "
+        }
+
+        if (image.length < 1) {
+            message += "Image url should be present. "
+        }
+
+        // check if ingredients exist
+        if (this.state.newIngredients.length < 1) {
+            message += "Ingredients should not be empty. "
+        }
+
+        // if any error is present, inform user
+        if (message.length > 1) {
+            this.setState({ newRecipeError: message })
+            return
+        }
+
+        let recipes = Object.assign({}, this.state.recipes)
+        recipes[title] = {
+            image: image,
+            description: desc,
+            ingredients: ingredients
+        }
         this.setState({
-            oldTitle: this.state.title,
-            oldIngredients: this.state.ingredients,
-            modalOpen: false
+            recipes: recipes,
+            newRecipeOpen: !this.state.newRecipeOpen
         });
     }
 
-    deleteRecipe() {
-        console.log("delete recipe");
+    // if cancel button on the newRecipe modal is pressed, close modal
+    // and overlay
+    newRecipeCancel() {
+        // close recipe modal and clear any error message
+        this.setState({ newRecipeOpen: !this.state.newRecipeOpen, newRecipeError: "" })
     }
 
-    openRecipeModal() {
-        this.setState({ modalOpen: true });
-    }
-
-    // if you close before you press save, recipe content will stay the same
-    closeRecipeModal() {
+    // when recipe div is clicked display modal with recipe details
+    // description and ingredients
+    showRecipe(e) {
+        let title = e.currentTarget.id;
         this.setState({
-            modalOpen: false,
-            title: this.state.oldTitle,
-            ingredients: this.state.oldIngredients
-        });
-    }
-
-
-    // display recipe and modal for each recipe
-    render() {
-        let ingredients = this.state.ingredients.map((ing, index) => {
-            return (
-                <li key={index}>{ing}</li>
-            );
+            viewRecipeOpen: !this.state.viewRecipeOpen,
+            viewRecipeData: this.state.recipes[title],
+            viewRecipeTitle: title
         })
+    }
 
+    // close recipe details modal
+    recipeClose() {
+        this.setState({ viewRecipeOpen: !this.state.viewRecipeOpen })
+    }
+
+    // Delete chosen recipe
+    recipeDelete(e) {
+        console.log(e.currentTarget.id);
+        let recipes = Object.assign({}, this.state.recipes); // creating copy
+        delete recipes[e.currentTarget.id]
+        this.setState({ recipes: recipes });
+        this.recipeClose();
+    }
+
+    render() {
         return (
-            <div>
-                <div className="recipe">
-                    <h2>{this.state.title}</h2>
-                    <h3 className="ingredients-title">Ingredients </h3>
-                    <ul className="ingredients">
-                        {ingredients}
-                    </ul>
-                    <button onClick={this.openRecipeModal}>Edit Recipe</button>
+            <div className="app">
+                <div className="navbar">
+                    <h1 className="title">Recipe Box</h1>
+                    <div className="spacer"></div>
+                    <button onClick={this.openNewRecipe}>New Recipe</button>
                 </div>
+                <NewRecipeModal onSubmit={this.newRecipeSubmit} onChange={this.newRecipeChange}
+                    open={this.state.newRecipeOpen} onSave={this.newRecipeSave} onCancel={this.newRecipeCancel}
+                    onError={this.state.newRecipeError} />
 
-                <div className={"recipe-modal " + (this.state.modalOpen ? "active" : "")}>
-                    <div className="close" onClick={this.closeRecipeModal}>X</div>
-                    <input type="text" value={this.state.title} onChange={this.changeTitle} ></input>
-                    <textarea value={this.state.ingredients} onChange={this.changeIngredients} />
-                    <button onClick={this.saveRecipe}>Save Recipe</button>
-                    <button onClick={this.deleteRecipe}> Delete Recipe </button>
-                </div>
-                <div className={"overlay " + (this.state.modalOpen ? 'active' : '')} onClick={this.closeRecipeModal}></div>
+                <RecipeContainer recipes={this.state.recipes} onClick={this.showRecipe} />
+                <ViewRecipe open={this.state.viewRecipeOpen} title={this.state.viewRecipeTitle}
+                    data={this.state.viewRecipeData} close={this.recipeClose} delete={this.recipeDelete} />
             </div>
-        );
+        )
     }
 }
 
