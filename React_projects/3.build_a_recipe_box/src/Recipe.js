@@ -37,6 +37,7 @@ class ViewRecipe extends React.Component {
             return (
                 <div>
                     <div className="modal view-recipe">
+                        <div className="modal-close" onClick={this.props.close}>x</div>
                         <h2 className="title"> {this.props.title} </h2>
                         <img src={this.props.data.image} alt={this.props.title} />
                         <h3> Ingredients: </h3>
@@ -51,8 +52,8 @@ class ViewRecipe extends React.Component {
                         <p>{this.props.data.description}</p>
 
                         <div className="btn-manage-row">
-                            <button onClick={this.props.save}>Edit</button>
-                            <button id={this.props.title} onClick={this.props.delete}>Delete</button>
+                            <button onClick={this.props.edit}>Edit</button>
+                            <button onClick={this.props.delete}>Delete</button>
                         </div>
 
                         <div className="modal-bottom-padding"></div>

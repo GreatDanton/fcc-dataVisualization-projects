@@ -40,7 +40,7 @@ class App extends React.Component {
             // for rendering view recipe modal
             viewRecipeOpen: false,
             viewRecipeData: "",
-            viewRecipeTitle: "",
+            viewRecipeTitle: ""
         }
 
         // handling new recipe modal window
@@ -52,6 +52,7 @@ class App extends React.Component {
         this.showRecipe = this.showRecipe.bind(this);
         this.recipeClose = this.recipeClose.bind(this);
         this.recipeDelete = this.recipeDelete.bind(this);
+        this.recipeEdit = this.recipeEdit.bind(this);
     }
 
     openNewRecipe() {
@@ -77,6 +78,11 @@ class App extends React.Component {
         let message = ""
         if (title.length < 1) {
             message += "Empty title is not allowed. "
+        }
+
+        // check if recipe with such title already exist
+        if (this.state.recipes.hasOwnProperty(title)) {
+            message += title + " already exist, please pick another recipe title. "
         }
 
         if (desc.length < 1) {
@@ -134,12 +140,17 @@ class App extends React.Component {
     }
 
     // Delete chosen recipe
-    recipeDelete(e) {
-        console.log(e.currentTarget.id);
+    recipeDelete() {
         let recipes = Object.assign({}, this.state.recipes); // creating copy
-        delete recipes[e.currentTarget.id]
+        delete recipes[this.state.viewRecipeTitle]
         this.setState({ recipes: recipes });
         this.recipeClose();
+    }
+
+    // Editing existing recipe
+    recipeEdit() {
+        let recipe = this.state.viewRecipeTitle;
+        console.log(recipe);
     }
 
     render() {
@@ -156,7 +167,10 @@ class App extends React.Component {
 
                 <RecipeContainer recipes={this.state.recipes} onClick={this.showRecipe} />
                 <ViewRecipe open={this.state.viewRecipeOpen} title={this.state.viewRecipeTitle}
-                    data={this.state.viewRecipeData} close={this.recipeClose} delete={this.recipeDelete} />
+                    data={this.state.viewRecipeData}
+                    close={this.recipeClose}
+                    delete={this.recipeDelete}
+                    edit={this.recipeEdit} />
             </div>
         )
     }

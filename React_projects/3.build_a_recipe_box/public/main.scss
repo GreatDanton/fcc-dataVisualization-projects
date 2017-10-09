@@ -110,6 +110,7 @@ body {
 
 .modal {
     width: 600px;
+    max-width: 100%;
     position: fixed;
     left: 50%;
     top: 50%;
@@ -119,6 +120,25 @@ body {
     padding: 40px 20px 0;
     max-height: calc(100vh - 150px);
     overflow-y: auto;
+}
+
+.modal-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 30px;
+    transition: $transition-default;
+    font-family: monospace;
+    font-size: 20px;
+}
+
+.modal-close:hover {
+    background-color: #009688;
+    color: #fff;
 }
 
 // overflow-y removes bottom padding from modal in firefox

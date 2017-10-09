@@ -1,5 +1,16 @@
 # Build a recipe box
 
+React project from FreeCodeCamp Data Visualization Projects section.
+
+# Screenshots
+
+![Front Page](/images/frontPage.png)
+
+![Recipe View](/images/recipeView.png)
+
+![New Recipe](/images/newRecipe.png)
+
+## User stories
 * User Story: I can create recipes that have names and ingredients.
 * User Story: I can see an index view where the names of all the recipes are visible.
 * User Story: I can click into any of those recipes to view it.
