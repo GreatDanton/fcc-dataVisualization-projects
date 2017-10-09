@@ -4,10 +4,13 @@ React project from FreeCodeCamp Data Visualization Projects section.
 
 # Screenshots
 
+## Front page
 ![Front Page](images/frontPage.png)
 
+## Viewing recipe
 ![Recipe View](images/recipeView.png)
 
+## Creating new recipe
 ![New Recipe](images/newRecipe.png)
 
 ## User stories
