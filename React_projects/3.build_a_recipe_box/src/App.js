@@ -37,6 +37,12 @@ class App extends React.Component {
             newIngredients: "",
             newDescription: "",
             newRecipeError: "", // show error message if any field is empty
+
+            // we are reusing new recipe template for saving and editing existing
+            // recipes. If editRecipe == true, we are editing recipe and save function
+            // should change existing recipe instead of submitting new
+            editRecipe: false,
+            editRecipeOldTitle: "",
             // for rendering view recipe modal
             viewRecipeOpen: false,
             viewRecipeData: "",
@@ -81,8 +87,12 @@ class App extends React.Component {
         }
 
         // check if recipe with such title already exist
-        if (this.state.recipes.hasOwnProperty(title)) {
-            message += title + " already exist, please pick another recipe title. "
+        // only perform this check if we are not editing existing
+        // recipe
+        if (!this.state.editRecipe) {
+            if (this.state.recipes.hasOwnProperty(title)) {
+                message += title + " already exist, please pick another recipe title. "
+            }
         }
 
         if (desc.length < 1) {
@@ -105,6 +115,27 @@ class App extends React.Component {
         }
 
         let recipes = Object.assign({}, this.state.recipes)
+        // Adding completely new recipe
+        if (!this.state.editRecipe) {
+            recipes[title] = {
+                image: image,
+                description: desc,
+                ingredients: ingredients
+            }
+            this.setState({
+                recipes: recipes,
+                newRecipeOpen: !this.state.newRecipeOpen
+            });
+            return
+        }
+
+        // if we are modifying existing recipe delete
+        // exisiting recipe
+        if (this.state.editRecipe) {
+            delete recipes[this.state.editRecipeOldTitle]
+        }
+
+        // adding new recipe inside the state
         recipes[title] = {
             image: image,
             description: desc,
@@ -112,8 +143,21 @@ class App extends React.Component {
         }
         this.setState({
             recipes: recipes,
-            newRecipeOpen: !this.state.newRecipeOpen
-        });
+            newRecipeOpen: false, // close modal
+            editRecipe: false, // we are not editing recipe anymore
+        }, () => { this.clearNewFields() });
+    }
+
+    // clears fields that populate modal for editing and modifying
+    // existing recipes
+    clearNewFields() {
+        this.setState({
+            newTitle: "",
+            newImage: "",
+            newIngredients: "",
+            newDescription: "",
+            editRecipeOldTitle: ""
+        })
     }
 
     // if cancel button on the newRecipe modal is pressed, close modal
@@ -149,8 +193,24 @@ class App extends React.Component {
 
     // Editing existing recipe
     recipeEdit() {
-        let recipe = this.state.viewRecipeTitle;
-        console.log(recipe);
+        let title = this.state.viewRecipeTitle;
+        let recipe = this.state.recipes[title];
+        this.recipeClose();
+        let img = recipe.image;
+        let ingred = recipe.ingredients.join(', ');
+        let desc = recipe.description;
+        this.setState({
+            newTitle: title,
+            newImage: img,
+            newIngredients: ingred,
+            newDescription: desc,
+            // open template
+            newRecipeOpen: !this.state.newRecipeOpen,
+            // By turning editRecipe to true we tell the save function
+            // to mutate existing recipe instead of adding new
+            editRecipe: !this.state.editRecipe,
+            editRecipeOldTitle: title
+        });
     }
 
     render() {
@@ -161,12 +221,22 @@ class App extends React.Component {
                     <div className="spacer"></div>
                     <button onClick={this.openNewRecipe}>New Recipe</button>
                 </div>
-                <NewRecipeModal onSubmit={this.newRecipeSubmit} onChange={this.newRecipeChange}
-                    open={this.state.newRecipeOpen} onSave={this.newRecipeSave} onCancel={this.newRecipeCancel}
-                    onError={this.state.newRecipeError} />
+                <NewRecipeModal
+                    onChange={this.newRecipeChange}
+                    open={this.state.newRecipeOpen}
+                    onSave={this.newRecipeSave}
+                    onCancel={this.newRecipeCancel}
+                    onError={this.state.newRecipeError}
+                    newTitle={this.state.newTitle}
+                    newImage={this.state.newImage}
+                    newIngredients={this.state.newIngredients}
+                    newDescription={this.state.newDescription}
+                />
 
                 <RecipeContainer recipes={this.state.recipes} onClick={this.showRecipe} />
-                <ViewRecipe open={this.state.viewRecipeOpen} title={this.state.viewRecipeTitle}
+
+                <ViewRecipe open={this.state.viewRecipeOpen}
+                    title={this.state.viewRecipeTitle}
                     data={this.state.viewRecipeData}
                     close={this.recipeClose}
                     delete={this.recipeDelete}

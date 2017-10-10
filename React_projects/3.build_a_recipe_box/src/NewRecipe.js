@@ -28,7 +28,7 @@ class NewRecipeModal extends React.Component {
 
                         <label htmlFor="newDescription">Description: </label><br />
                         <textarea id="newDescription" className="description" placeholder="Description"
-                            onChange={this.props.onChange}>{this.props.newDescription}</textarea>
+                            onChange={this.props.onChange} value={this.props.newDescription}></textarea>
 
                         <button onClick={this.props.onSave}>Save </button>
                         <button onClick={this.props.onCancel}>Cancel </button>
