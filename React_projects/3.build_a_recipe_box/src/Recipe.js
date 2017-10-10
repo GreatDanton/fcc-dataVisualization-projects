@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloseModal } from './closeButton';
 
 class RecipeContainer extends React.Component {
     render() {
@@ -37,7 +38,8 @@ class ViewRecipe extends React.Component {
             return (
                 <div>
                     <div className="modal view-recipe">
-                        <div className="modal-close" onClick={this.props.close}>x</div>
+                        <CloseModal onClick={this.props.close} />
+
                         <h2 className="title"> {this.props.title} </h2>
                         <img src={this.props.data.image} alt={this.props.title} />
                         <h3> Ingredients: </h3>

@@ -5,7 +5,7 @@ import { NewRecipeModal } from './NewRecipe';
 
 // Global storage for handling recipe data. Each component has access to globalStorage
 // data
-let globalStorage = {
+let defaultRecipes = {
     "Coffee": {
         "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/A_small_cup_of_coffee.JPG/275px-A_small_cup_of_coffee.JPG",
         "ingredients": ["Hot Water", "Coffee"],
@@ -29,7 +29,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            recipes: globalStorage,
+            recipes: "",
             // for storing data for new recipe
             newRecipeOpen: false,
             newTitle: "",
@@ -61,6 +61,22 @@ class App extends React.Component {
         this.recipeEdit = this.recipeEdit.bind(this);
     }
 
+    // on component mount import recipes from local storage
+    // otherwise load default three recipes
+    componentWillMount() {
+        let ls = localStorage.getItem('recipes');
+        // recipes in local storage exist, load recipes from
+        // local storage
+        if (ls !== null) {
+            this.setState({ recipes: JSON.parse(ls) });
+            return;
+        }
+        // local storage does not exist => load default recipes
+        this.setState({ recipes: defaultRecipes });
+    }
+
+    // open 'new' recipe modal, for creating new recipes
+    // or modifying existing recipes
     openNewRecipe() {
         if (!this.state.newRecipeOpen) {
             this.setState({ newRecipeOpen: true });
@@ -74,8 +90,8 @@ class App extends React.Component {
         this.setState({ [id]: val })
     }
 
-    // Save new recipe to the local storage
-    // TODO: save the recipe to the local storage
+    // Save new recipe to state and local storage or display
+    // error message
     newRecipeSave() {
         let title = this.state.newTitle;
         let desc = this.state.newDescription;
@@ -115,21 +131,7 @@ class App extends React.Component {
         }
 
         let recipes = Object.assign({}, this.state.recipes)
-        // Adding completely new recipe
-        if (!this.state.editRecipe) {
-            recipes[title] = {
-                image: image,
-                description: desc,
-                ingredients: ingredients
-            }
-            this.setState({
-                recipes: recipes,
-                newRecipeOpen: !this.state.newRecipeOpen
-            });
-            return
-        }
-
-        // if we are modifying existing recipe delete
+        // if we are modifying existing recipe first we have to delete
         // exisiting recipe
         if (this.state.editRecipe) {
             delete recipes[this.state.editRecipeOldTitle]
@@ -146,6 +148,8 @@ class App extends React.Component {
             newRecipeOpen: false, // close modal
             editRecipe: false, // we are not editing recipe anymore
         }, () => { this.clearNewFields() });
+        // add recipes to local storage
+        localStorage.setItem('recipes', JSON.stringify(recipes));
     }
 
     // clears fields that populate modal for editing and modifying
@@ -188,6 +192,7 @@ class App extends React.Component {
         let recipes = Object.assign({}, this.state.recipes); // creating copy
         delete recipes[this.state.viewRecipeTitle]
         this.setState({ recipes: recipes });
+        localStorage.setItem('recipes', JSON.stringify(recipes)); // add to local storage
         this.recipeClose();
     }
 

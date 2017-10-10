@@ -124,21 +124,19 @@ body {
 
 .modal-close {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 30px;
-    height: 30px;
+    top: 10px;
+    right: 10px;
     cursor: pointer;
-    text-align: center;
-    line-height: 30px;
+    stroke-width: 8;
+    color: $color-text;
+    stroke: #c2c2c2;
+    stroke-linecap: round;
+    fill: none;
     transition: $transition-default;
-    font-family: monospace;
-    font-size: 20px;
 }
 
 .modal-close:hover {
-    background-color: #009688;
-    color: #fff;
+    stroke: $color-text;
 }
 
 // overflow-y removes bottom padding from modal in firefox

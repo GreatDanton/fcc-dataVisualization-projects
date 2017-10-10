@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloseModal } from './closeButton';
 
 // renders modal for adding new recipe
 class NewRecipeModal extends React.Component {
@@ -7,6 +8,7 @@ class NewRecipeModal extends React.Component {
             return (
                 <div>
                     <div className="modal new-recipe">
+                        <CloseModal onClick={this.props.onCancel} />
                         <h2 className="card-title"> New Recipe </h2>
                         <label htmlFor="newTitle">Title: </label><br />
                         <input id="newTitle" type="text" placeholder="Recipe title"
@@ -39,7 +41,7 @@ class NewRecipeModal extends React.Component {
                     </div>
 
                     <div className="overlay" onClick={this.props.onCancel}> </div>
-                </div>
+                </div >
             )
         } else {
             return (
